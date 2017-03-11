@@ -17,7 +17,8 @@ import javax.sql.DataSource;
  */
 
 @Configuration
-
+@MapperScan("org.abondar.experimental.countmeup.mappers")
+@PropertySource("classpath:db.properties")
 public class DataBaseConfiguration {
 
     @Value("${driverClassName}")
@@ -42,7 +43,7 @@ public class DataBaseConfiguration {
     public DataSource dataSource(){
         BasicDataSource dataSource =  new BasicDataSource();
         dataSource.setDriverClassName(driverClassName);
-        dataSource.setUrl("jdbc:/mysql://"+ipAddress
+        dataSource.setUrl("jdbc:mysql://"+ipAddress
                 +":"+port+"/"+dbName);
         dataSource.setUsername(username);
         dataSource.setPassword(password);

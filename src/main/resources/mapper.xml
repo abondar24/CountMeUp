@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.abondar.experimental.countmeup.mappers.Mapper">
+
+
+    <!--table user -->
+    <sql id="userTable">
+        user usr
+    </sql>
+
+    <sql id="userFields">
+        usr.id as usr_id,
+        usr.userId as usr_userId,
+        usr.token as usr_token,
+        usr.voteAttempts as usr_voteAttempts
+    </sql>
+
+    <resultMap id="userMap" type="User">
+        <id column="usr_id" property="id"/>
+        <result column="usr_userId" property="user_id"/>
+        <result column="usr_token" property="token"/>
+        <result column="usr_voteAttempts" property="vote_attempts"/>
+    </resultMap>
+
+    <insert id="inserOrUpdatetUser" useGeneratedKeys="true" keyColumn="id" keyProperty="user.id">
+        INSERT INTO
+            user (name, userId, token, voteAttempts)
+        VALUES (
+            #{user.name},
+            #{user.userId},
+            #{user.token},
+            #{user.voteAttempts}
+        )
+        ON DUPLICATE KEY UPDATE
+            name         = #{user.name},
+            userId       = #{user.userID},
+            token        = #{user.token},
+            voteAttempts = #{user.voteAttempts}
+
+    </insert>
+
+    <select id="findUserById" resultMap="userMap">
+        SELECT
+        <include refid="userFields"/>
+        FROM
+        <include refid="userTable"/>
+        WHERE usr.id = #{id}
+    </select>
+
+
+    <!--table competition -->
+    <sql id="competitionTable">
+        competition comp
+    </sql>
+
+    <sql id="competitionFields">
+        comp.id as comp_id,
+        comp.startDate as comp_startDate,
+        comp.endDate as comp_endDate,
+        comp.isActive as comp_isActive
+    </sql>
+
+    <resultMap id="competitionMap" type="Competition">
+        <id column="comp_id" property="id"/>
+        <result column="comp_startDate" property="start_date"/>
+        <result column="comp_endDate" property="end_date"/>
+        <result column="comp_isActive" property="is_active"/>
+    </resultMap>
+
+    <insert id="inserOrUpdatetCompetition" useGeneratedKeys="true" keyColumn="id" keyProperty="competition.id">
+        INSERT INTO
+            competition (startDate, endDate, isActive)
+        VALUES (
+            #{competition.startDate},
+            #{competition.endDate},
+            #{competition.isActive}
+        )
+        ON DUPLICATE KEY UPDATE
+            startDate = #{competition.startDate},
+            endDate   = #{competition.endDate},
+            isActive  = #{competition.isActive}
+
+    </insert>
+
+    <select id="findCompetitionById" resultMap="competitionMap">
+        SELECT
+        <include refid="competitionFields"/>
+        FROM
+        <include refid="competitionTable"/>
+        WHERE comp.id = #{id}
+
+    </select>
+
+    <delete id="deleteAllCompetitions">
+        DELETE FROM competition
+    </delete>
+
+
+    <!--table candidate -->
+    <sql id="candidateTable">
+        candidate cand
+    </sql>
+
+    <sql id="candidateFields">
+        cand.id as cand_id,
+        cand.name as cand_name,
+        cand.competitionId as cand_competitionId
+    </sql>
+
+    <resultMap id="candidateMap" type="Candidate">
+        <id column="cand_id" property="id"/>
+        <result column="cand_name" property="name"/>
+        <result column="cand_competitionId" property="competition_id"/>
+    </resultMap>
+
+    <insert id="insertOrUpdateCandidate" useGeneratedKeys="true" keyColumn="id" keyProperty="candidate.id">
+        INSERT INTO
+            candidate (name, competitionId)
+        VALUES (
+            #{candidate.name},
+            #{candidate.competitionId}
+        )
+        ON DUPLICATE KEY UPDATE
+            name    = #{candidate.name},
+            endDate = #{candidate.competitionId}
+    </insert>
+
+    <select id="findCandidatesByIds" resultMap="competitionMap">
+        SELECT
+        <include refid="candidateFields"/>
+        FROM
+        <include refid="candidateTable"/>
+        WHERE cand.id in (<foreach collection="candIds" item="param1" separator=",">#{param}</foreach>)
+    </select>
+
+    <delete id="deleteAllCandidates">
+        DELETE FROM candidate
+    </delete>
+
+    <!--table vote -->
+    <sql id="voteTable">
+        vote vt
+    </sql>
+
+    <sql id="voteFields">
+        vt.id as vt_id,
+        vt.candidateId as vt_candidateId,
+        vt.competitionId as vt_competitionId
+    </sql>
+
+    <resultMap id="voteMap" type="Vote">
+        <id column="vote_id" property="id"/>
+        <result column="vt_candidateId" property="candidate_id"/>
+        <result column="vt_competitionId" property="competition_id"/>
+    </resultMap>
+
+    <insert id="insertOrUpdateCandidate" useGeneratedKeys="true" keyColumn="id" keyProperty="vote.id">
+        INSERT INTO
+            vote (candidateId, competitionId)
+        VALUES (
+            #{vote.candidateId},
+            #{vote.competitionId}
+        )
+        ON DUPLICATE KEY UPDATE
+            candidateId   = #{vote.candidateId},
+            competitionId = #{vote.competitionId}
+    </insert>
+
+    <select id="findVotesForCompetition" resultMap="voteMap">
+        SELECT
+        <include refid="voteFields"/>
+        FROM
+        <include refid="voteTable"/>
+        WHERE vt.competitionId = #{competitionId}
+    </select>
+
+
+    <select id="findVotesForCandidate" resultMap="voteMap">
+        SELECT
+        <include refid="voteFields"/>
+        FROM
+        <include refid="voteTable"/>
+        WHERE vt.competitionId = #{competitionId} AND vt.candidateId= #{candidateID}
+    </select>
+
+
+    <delete id="deleteAllVotes">
+        DELETE FROM vote
+    </delete>
+
+
+</mapper>

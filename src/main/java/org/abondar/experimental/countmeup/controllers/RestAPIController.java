@@ -58,9 +58,9 @@ public class RestAPIController {
     }
 
 
-    @RequestMapping(value = "/get_votes_of_candidate", method = RequestMethod.GET)
+    @RequestMapping(value = "/get_votes_for_candidate", method = RequestMethod.GET)
     @ResponseBody
-    public Double getTotalVotesOfCandidate(@RequestParam(value = "candidate") String candidate,
+    public Double getTotalVotesOfCandidate(@RequestParam(value = "candidate") Long candidate,
                                            @RequestParam(value = "competition") Long competition,
                                            @RequestParam(value = "mode") String mode) {
 
@@ -70,23 +70,32 @@ public class RestAPIController {
 
     @RequestMapping(value = "/add_competition", method = RequestMethod.PUT)
     @ResponseBody
-    public void AddCompetition() {
+    public void addCompetition() {
 
         Date date = new Date();
         Competition competition = new Competition(date.toString());
 
     }
 
+    @RequestMapping(value = "/add_candidate", method = RequestMethod.PUT)
+    @ResponseBody
+    public void addCandidate() {
+
+        Date date = new Date();
+
+
+    }
+
     @RequestMapping(value = "/start_competition", method = RequestMethod.PUT)
     @ResponseBody
-    public void StartCompetition() {
+    public void startCompetition() {
 
 
     }
 
     @RequestMapping(value = "/end_competition", method = RequestMethod.PUT)
     @ResponseBody
-    public void EndCompetition() {
+    public void endCompetition() {
 
 
     }
