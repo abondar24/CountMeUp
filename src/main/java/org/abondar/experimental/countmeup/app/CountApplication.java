@@ -1,12 +1,14 @@
 package org.abondar.experimental.countmeup.app;
 
 import org.abondar.experimental.countmeup.configurations.DataBaseConfiguration;
+import org.abondar.experimental.countmeup.configurations.WebSocketConfiguration;
 import org.abondar.experimental.countmeup.controllers.RestAPIController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 
@@ -14,8 +16,8 @@ import org.springframework.context.annotation.Import;
 @SpringBootApplication
 @EnableAutoConfiguration
 @ComponentScan(basePackageClasses = RestAPIController.class)
-@Import(DataBaseConfiguration.class)
-public class CountApplication {
+@Import({DataBaseConfiguration.class,WebSocketConfiguration.class})
+public class CountApplication extends SpringBootServletInitializer {
 
     static Logger logger = LoggerFactory.getLogger(CountApplication.class);
 
