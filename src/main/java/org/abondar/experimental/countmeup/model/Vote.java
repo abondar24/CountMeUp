@@ -9,6 +9,12 @@ public class Vote {
     private String candidate;
     private Long competitionId;
 
+    public Vote(String candidate, Long competitionId) {
+        this.candidate = candidate;
+        this.competitionId = competitionId;
+    }
+
+    public Vote(){}
 
     public Long getId() {
         return id;

@@ -10,6 +10,14 @@ public class User {
     private String token;
     private int voteAttempts;
 
+    public User(String userId, String token) {
+        this.userId = userId;
+        this.token = token;
+        this.voteAttempts = 0;
+    }
+
+    public User(){}
+
     public Long getId() {
         return id;
     }

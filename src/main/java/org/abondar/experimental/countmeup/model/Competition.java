@@ -7,6 +7,12 @@ public class Competition {
     private Long id;
     private String startDate;
     private String endDate;
+    private Boolean isActive;
+
+    public Competition(String startDate) {
+        this.startDate = startDate;
+        this.isActive = false;
+    }
 
     public Long getId() {
         return id;
@@ -32,13 +38,21 @@ public class Competition {
         this.endDate = endDate;
     }
 
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
+    }
+
     @Override
     public String toString() {
         return "Competition{" +
                 "id=" + id +
                 ", startDate='" + startDate + '\'' +
                 ", endDate='" + endDate + '\'' +
+                ", isActive=" + isActive +
                 '}';
     }
-
 }
