@@ -1,8 +1,6 @@
 package org.abondar.experimental.countmeup.model;
 
-/**
- * Created by abondar on 3/10/17.
- */
+
 public class Competition {
     private Long id;
     private String startDate;

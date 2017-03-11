@@ -39,7 +39,7 @@ public class RestAPIController {
 
     @RequestMapping(value = "/vote", method = RequestMethod.POST)
     @ResponseBody
-    public String vote(@RequestParam(value = "candidate") String candidate,
+    public String vote(@RequestParam(value = "candidate") Long candidate,
                        @RequestParam(value = "competition") Long competition) {
 
         Vote vote = new Vote(candidate, competition);

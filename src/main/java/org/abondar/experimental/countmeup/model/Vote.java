@@ -1,16 +1,14 @@
 package org.abondar.experimental.countmeup.model;
 
-/**
- * Created by abondar on 3/10/17.
- */
+
 public class Vote {
 
     private Long id;
-    private String candidate;
+    private Long candidateId;
     private Long competitionId;
 
-    public Vote(String candidate, Long competitionId) {
-        this.candidate = candidate;
+    public Vote(Long candidateID, Long competitionId) {
+        this.candidateId = candidateID;
         this.competitionId = competitionId;
     }
 
@@ -24,12 +22,12 @@ public class Vote {
         this.id = id;
     }
 
-    public String getCandidate() {
-        return candidate;
+    public Long getCandidateId() {
+        return candidateId;
     }
 
-    public void setCandidate(String candidate) {
-        this.candidate = candidate;
+    public void setCandidateId(Long candidateID) {
+        this.candidateId = candidateID;
     }
 
     public Long getCompetitionId() {
@@ -44,7 +42,7 @@ public class Vote {
     public String toString() {
         return "Vote{" +
                 "id=" + id +
-                ", candidate='" + candidate + '\'' +
+                ", candidateID=" + candidateId +
                 ", competitionId=" + competitionId +
                 '}';
     }
