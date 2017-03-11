@@ -1,0 +1,28 @@
+plugins {
+    id 'org.springframework.boot' version '1.5.2.RELEASE'
+}
+group 'org.abondar.experimental'
+version '0.8'
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    jcenter()
+    maven {url "http://repo.spring.io/libs-snapshot"}
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.24'
+    compile group: 'org.springframework', name: 'spring-core', version: '4.3.7.RELEASE'
+    compile group: 'org.springframework', name: 'spring-context', version: '4.3.7.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '1.5.2.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '1.5.2.RELEASE'
+
+}
+
