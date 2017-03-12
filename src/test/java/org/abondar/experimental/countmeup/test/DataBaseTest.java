@@ -163,7 +163,7 @@ public class DataBaseTest {
         Competition foundCompetition = competitions.get(0);
         logger.info(foundCompetition.toString());
 
-        Long activeCompetitionId =mapper.findActiveCompetition();
+        Long activeCompetitionId =mapper.findActiveCompetitionId();
 
         assertTrue("Competition found", foundCompetition.getId().equals(activeCompetitionId));
 

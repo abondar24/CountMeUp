@@ -20,6 +20,15 @@ public class CandidateVote {
         this.name = name;
     }
 
+
+    public Integer getVotes() {
+        return votes;
+    }
+
+    public void setVotes(Integer votes) {
+        this.votes = votes;
+    }
+
     @Override
     public String toString() {
         return "{" + " name:'" + name  + " votes:" + votes + "}";

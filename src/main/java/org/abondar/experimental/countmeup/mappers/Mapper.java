@@ -20,7 +20,8 @@ public interface Mapper {
     User findUserByUserId(@Param("userId") String  userId);
     User findUserByToken(@Param("token") String  token);
     Competition findCompetitionById(@Param("id") Long id);
-    Long findActiveCompetition();
+    Long findActiveCompetitionId();
+    Competition findActiveCompetition();
     List<Competition> findAllCompetitions();
     Candidate findCandidateByName(@Param("name")String name);
     Candidate findCandidateById(@Param("id")Long id);

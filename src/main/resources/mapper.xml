@@ -117,7 +117,15 @@
         <include refid="competitionTable"/>
     </select>
 
-    <select id="findActiveCompetition" resultMap="competitionIdMap">
+    <select id="findActiveCompetitionId" resultMap="competitionIdMap">
+        SELECT
+        <include refid="competitionFields"/>
+        FROM
+        <include refid="competitionTable"/>
+        WHERE is_active = true
+    </select>
+
+    <select id="findActiveCompetition" resultMap="competitionMap">
         SELECT
         <include refid="competitionFields"/>
         FROM

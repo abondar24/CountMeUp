@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.UUID;
 
 
-
 @RestController
 @RequestMapping("/count_me")
 public class RestAPIController {
@@ -135,6 +134,16 @@ public class RestAPIController {
     }
 
 
+    @RequestMapping(value = "/get_active_competition", method = RequestMethod.GET)
+    @ResponseBody
+    public Competition getActiveCompetition() {
+
+        Competition competition = mapper.findActiveCompetition();
+
+        return competition;
+    }
+
+
     // these methods are not used by web client
 
     @RequestMapping(value = "/add_competition", method = RequestMethod.PUT)
@@ -148,21 +157,19 @@ public class RestAPIController {
     }
 
 
-
-
     @RequestMapping(value = "/add_candidate", method = RequestMethod.POST)
     @ResponseBody
     public Candidate addCandidate(@RequestParam(value = "name") String name,
-                             @RequestParam(value = "competition") Long competitionId) {
+                                  @RequestParam(value = "competition") Long competitionId) {
 
         Competition competition = mapper.findCompetitionById(competitionId);
 
-        if (competition!=null) {
+        if (competition != null) {
             Candidate candidate = new Candidate(name, competitionId);
             mapper.insertOrUpdateCandidate(candidate);
             logger.info("Candidate added");
             return candidate;
-        }  else{
+        } else {
             logger.info("No competition found");
             return null;
         }
@@ -173,13 +180,13 @@ public class RestAPIController {
     @ResponseBody
     public String startCompetition(@RequestParam(value = "competition") Long competitionId) {
         Competition competition = mapper.findCompetitionById(competitionId);
-        if (competition!=null) {
+        if (competition != null) {
             competition.setActive(true);
             mapper.insertOrUpdateCompetition(competition);
 
             logger.info("Competition started");
             return "competition started";
-        }  else{
+        } else {
             logger.info("No competition found");
             return "No competition found";
         }
@@ -192,14 +199,14 @@ public class RestAPIController {
     public String endCompetition(@RequestParam(value = "competition") Long competitionId) {
 
         Competition competition = mapper.findCompetitionById(competitionId);
-        if (competition!=null) {
+        if (competition != null) {
             competition.setActive(false);
             Date date = new Date();
             competition.setEndDate(date.toString());
             mapper.insertOrUpdateCompetition(competition);
             logger.info("Competition started");
             return "competition started";
-        }  else{
+        } else {
             logger.info("No competition found");
             return "No competition found";
         }
