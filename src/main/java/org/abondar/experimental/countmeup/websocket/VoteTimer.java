@@ -26,12 +26,13 @@ public class VoteTimer {
 
     public static WebSocketSession session;
 
-    private  static Vector<CandidateVote> candidateVotes = new Vector<>();
 
+    public static void tick() throws Exception {
 
-    public static synchronized void addCandidateVotes(Long competitionId) {
+        List<CandidateVote> candidateVotes = new ArrayList<>();
+
+        Long competitionId = mapper.findActiveCompetition();
         List<Vote> votes = mapper.findVotesForCompetition(competitionId);
-        logger.info("ss1");
         for (Vote vote : votes) {
             Candidate candidate = mapper.findCandidateById(vote.getCandidateId());
             List<Vote> candVotes = mapper.findVotesForCandidate(candidate.getName(), competitionId);
@@ -39,20 +40,14 @@ public class VoteTimer {
             logger.info(candidate.getName() + " "+candVotes.size());
         }
 
+        if (!candidateVotes.isEmpty()) {
+            for (CandidateVote candidateVote : candidateVotes) {
+                session.sendMessage(new TextMessage(candidateVote.toString()));
+            }
 
-    }
-
-
-
-    public static void tick() throws Exception {
-        logger.info("ss21");
-
-        for (int i=0; i<10;i++){
-            session.sendMessage(new TextMessage("ss21"));
+        } else {
+            session.sendMessage(new TextMessage("No active competitions now"));
         }
-//        for (CandidateVote candidateVote : candidateVotes) {
-//           session.sendMessage(new TextMessage(candidateVote.toString()));
-//        }
 
     }
 

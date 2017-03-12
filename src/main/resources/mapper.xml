@@ -81,6 +81,11 @@
         <result column="comp_isActive" property="isActive"/>
     </resultMap>
 
+    <resultMap id="competitionIdMap" type="Long">
+        <id column="comp_id" property="id"/>
+
+    </resultMap>
+
     <insert id="insertOrUpdateCompetition" useGeneratedKeys="true" keyColumn="id" keyProperty="competition.id">
         INSERT INTO
             competition (start_date, end_date, is_active)
@@ -111,6 +116,15 @@
         FROM
         <include refid="competitionTable"/>
     </select>
+
+    <select id="findActiveCompetition" resultMap="competitionIdMap">
+        SELECT
+        <include refid="competitionFields"/>
+        FROM
+        <include refid="competitionTable"/>
+        WHERE is_active = true
+    </select>
+
 
     <delete id="deleteAllCompetitions">
         DELETE FROM competition

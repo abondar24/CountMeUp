@@ -147,6 +147,28 @@ public class DataBaseTest {
 
     }
 
+    @Test
+    public void testFindActiveCompetition() {
+        logger.info("Find Active Competition ");
+        mapper.deleteAllVotes();
+        mapper.deleteAllCandidates();
+        mapper.deleteAllCompetitions();
+
+        Date startDate = new Date();
+        Competition competition = new Competition(startDate.toString());
+        competition.setActive(true);
+        mapper.insertOrUpdateCompetition(competition);
+
+        List<Competition> competitions = mapper.findAllCompetitions();
+        Competition foundCompetition = competitions.get(0);
+        logger.info(foundCompetition.toString());
+
+        Long activeCompetitionId =mapper.findActiveCompetition();
+
+        assertTrue("Competition found", foundCompetition.getId().equals(activeCompetitionId));
+
+    }
+
 
     @Test
     public void testCandidate() {
