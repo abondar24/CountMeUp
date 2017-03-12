@@ -17,15 +17,16 @@ public interface Mapper {
     void insertOrUpdateCompetition(@Param("competition")Competition competition);
     void insertVote(@Param("vote")Vote vote);
     void insertOrUpdateCandidate(@Param("candidate")Candidate candidate);
-    User findUserById(@Param("id") Long id);
+    User findUserByUserId(@Param("userId") String  userId);
     Competition findCompetitionById(@Param("id") Long id);
     List<Vote> findVotesForCompetition(@Param("competition_id")Long competition_id);
     List<Candidate> findCandidatesByIds(@Param("candIds") List<Long> candIdList);
     List<Vote> findVotesForCandidate(@Param("candidate") Long candidate,
-                                    @Param("competition_id")Long competition_id);
+                                     @Param("competition_id")Long competition_id);
     void deleteAllVotes();
     void deleteAllCandidates();
     void deleteAllCompetitions();
+    void deleteAllUsers();
 
 
 

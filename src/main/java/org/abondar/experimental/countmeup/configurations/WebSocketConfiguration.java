@@ -6,9 +6,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.socket.config.annotation.*;
 
 
-/**
- * Created by abondar on 3/10/17.
- */
+
 @Configuration
 @EnableWebSocket
 @EnableScheduling

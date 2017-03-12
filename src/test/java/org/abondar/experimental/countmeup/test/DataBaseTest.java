@@ -18,9 +18,6 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by abondar on 3/11/17.
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @Import(DataBaseConfiguration.class)
 @SpringBootApplication(scanBasePackageClasses = CountApplication.class)
@@ -33,15 +30,17 @@ public class DataBaseTest {
     @Test
     public void testInsertUser(){
         logger.info("Insert User Test");
+        mapper.deleteAllUsers();
 
         UUID uuid = UUID.randomUUID();
+        String userID = uuid.toString();
         User user = new User(uuid.toString(),"sadadsad");
 
         mapper.insertOrUpdateUser(user);
-        Long id = 1L;
 
-        User foundUser = mapper.findUserById(1L);
-        assertTrue("User Id is fine", foundUser.getUserId().equals(uuid.toString()));
+        User foundUser = mapper.findUserByUserId(userID);
+        logger.info(foundUser.toString());
+        assertTrue("User Id is fine", foundUser.getUserId().equals(userID));
 
     }
 }

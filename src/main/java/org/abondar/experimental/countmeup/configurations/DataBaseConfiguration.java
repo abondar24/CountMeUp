@@ -1,6 +1,10 @@
 package org.abondar.experimental.countmeup.configurations;
 
 import org.abondar.experimental.countmeup.mappers.Mapper;
+import org.abondar.experimental.countmeup.model.Candidate;
+import org.abondar.experimental.countmeup.model.Competition;
+import org.abondar.experimental.countmeup.model.User;
+import org.abondar.experimental.countmeup.model.Vote;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -16,9 +20,6 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import javax.sql.DataSource;
 
-/**
- * Created by abondar on 3/10/17.
- */
 
 @Configuration
 @MapperScan("org.abondar.experimental.countmeup.mappers")
@@ -26,8 +27,8 @@ import javax.sql.DataSource;
 public class DataBaseConfiguration {
 
 
-    @Value("${driverClassName}")
-    public String driverClassName;
+//    @Value("${driverClassName}")
+//    public String driverClassName;
 
     @Value("${ip_address}")
     public String ipAddress;
@@ -45,11 +46,11 @@ public class DataBaseConfiguration {
     public String password;
 
     @Bean
-    public DataSource dataSource(){
-        BasicDataSource dataSource =  new BasicDataSource();
-        dataSource.setDriverClassName(driverClassName);
-        dataSource.setUrl("jdbc:mysql://"+ipAddress
-                +":"+port+"/"+dbName);
+    public DataSource dataSource() {
+        BasicDataSource dataSource = new BasicDataSource();
+//        dataSource.setDriverClassName(driverClassName);
+        dataSource.setUrl("jdbc:mysql://" + ipAddress
+                + ":" + port + "/" + dbName);
         dataSource.setUsername(username);
         dataSource.setPassword(password);
 
@@ -58,27 +59,30 @@ public class DataBaseConfiguration {
 
 
     @Bean
-    public DataSourceTransactionManager transactionManager(){
+    public DataSourceTransactionManager transactionManager() {
         return new DataSourceTransactionManager(dataSource());
 
     }
 
 
     @Bean
-    public SqlSessionFactory sqlSessionFactory() throws Exception{
+    public SqlSessionFactory sqlSessionFactory() throws Exception {
         SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
-        Resource resource = new ClassPathResource("/db_configuration.xml");
-        sessionFactory.setConfigLocation(resource);
+        Resource resource = new ClassPathResource("/mapper.xml");
+        Resource[] resources = new Resource[]{resource};
+        sessionFactory.setMapperLocations(resources);
+
+        Class<?>[] aliases = new Class<?>[]{
+                User.class,
+                Candidate.class,
+                Competition.class,
+                Vote.class
+        };
+        sessionFactory.setTypeAliases(aliases);
 
         return sessionFactory.getObject();
     }
 
-    @Bean
-    public Mapper mapper() throws Exception{
-        final SqlSessionTemplate template = new SqlSessionTemplate(sqlSessionFactory());
-        template.getConfiguration().addMapper(Mapper.class);
 
-        return template.getMapper(Mapper.class);
-    }
 }

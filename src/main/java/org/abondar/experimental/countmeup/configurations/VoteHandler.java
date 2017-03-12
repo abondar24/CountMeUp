@@ -6,9 +6,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-/**
- * Created by abondar on 3/11/17.
- */
+
 public class VoteHandler extends TextWebSocketHandler {
 
     static Logger logger = LoggerFactory.getLogger(VoteHandler.class);
