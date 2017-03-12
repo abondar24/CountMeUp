@@ -25,7 +25,7 @@
         <result column="usr_voteAttempts" property="vote_attempts"/>
     </resultMap>
 
-    <insert id="inserOrUpdatetUser" useGeneratedKeys="true" keyColumn="id" keyProperty="user.id">
+    <insert id="insertOrUpdateUser" useGeneratedKeys="true" keyColumn="id" keyProperty="user.id">
         INSERT INTO
             user (name, userId, token, voteAttempts)
         VALUES (

@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface Mapper {
 
-    void inserOrUpdatetUser(@Param("user") User user);
+    void insertOrUpdateUser(@Param("user") User user);
     void insertOrUpdateCompetition(@Param("competition")Competition competition);
     void insertVote(@Param("vote")Vote vote);
     void insertOrUpdateCandidate(@Param("candidate")Candidate candidate);

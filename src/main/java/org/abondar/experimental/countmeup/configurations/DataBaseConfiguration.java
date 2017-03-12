@@ -1,13 +1,17 @@
 package org.abondar.experimental.countmeup.configurations;
 
+import org.abondar.experimental.countmeup.mappers.Mapper;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import javax.sql.DataSource;
@@ -20,6 +24,7 @@ import javax.sql.DataSource;
 @MapperScan("org.abondar.experimental.countmeup.mappers")
 @PropertySource("classpath:db.properties")
 public class DataBaseConfiguration {
+
 
     @Value("${driverClassName}")
     public String driverClassName;
@@ -63,6 +68,17 @@ public class DataBaseConfiguration {
     public SqlSessionFactory sqlSessionFactory() throws Exception{
         SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
+        Resource resource = new ClassPathResource("/db_configuration.xml");
+        sessionFactory.setConfigLocation(resource);
+
         return sessionFactory.getObject();
+    }
+
+    @Bean
+    public Mapper mapper() throws Exception{
+        final SqlSessionTemplate template = new SqlSessionTemplate(sqlSessionFactory());
+        template.getConfiguration().addMapper(Mapper.class);
+
+        return template.getMapper(Mapper.class);
     }
 }
