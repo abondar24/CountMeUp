@@ -22,6 +22,7 @@ public interface Mapper {
     Competition findCompetitionById(@Param("id") Long id);
     List<Competition> findAllCompetitions();
     Candidate findCandidateByName(@Param("name")String name);
+    Candidate findCandidateById(@Param("id")Long id);
     List<Candidate> findCandidatesByCompetitionId(@Param("competitionId") Long competitionId);
     List<Vote> findVotesForCompetition(@Param("competitionId")Long competitionId);
     List<Vote> findVotesForCandidate(@Param("name") String name,

@@ -162,6 +162,14 @@
         WHERE cand.name =#{name}
     </select>
 
+    <select id="findCandidateById" resultMap="candidateMap">
+        SELECT
+        <include refid="candidateFields"/>
+        FROM
+        <include refid="candidateTable"/>
+        WHERE cand.id =#{id}
+    </select>
+
 
     <delete id="deleteAllCandidates">
         DELETE FROM candidate

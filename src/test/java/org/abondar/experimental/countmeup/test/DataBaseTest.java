@@ -8,6 +8,7 @@ import org.abondar.experimental.countmeup.model.Candidate;
 import org.abondar.experimental.countmeup.model.Competition;
 import org.abondar.experimental.countmeup.model.User;
 import org.abondar.experimental.countmeup.model.Vote;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -170,6 +171,30 @@ public class DataBaseTest {
 
     }
 
+    @Test
+    public void testFindCandidateById() {
+        logger.info("Insert Candidate Test");
+        mapper.deleteAllVotes();
+        mapper.deleteAllCandidates();
+        mapper.deleteAllCompetitions();
+
+        Date startDate = new Date();
+        Competition competition = new Competition(startDate.toString());
+        mapper.insertOrUpdateCompetition(competition);
+        List<Competition> competitions = mapper.findAllCompetitions();
+        competition = competitions.get(0);
+
+        String name = "Vasya Pupkin";
+        Candidate candidate = new Candidate(name,competition.getId());
+
+        mapper.insertOrUpdateCandidate(candidate);
+        Candidate foundCandidate = mapper.findCandidateByName(name);
+        Candidate candidateById = mapper.findCandidateById(foundCandidate.getId());
+
+        assertTrue("Candidate found by id", candidateById.getId().equals(foundCandidate.getId()));
+
+    }
+
 
     @Test
     public void testFindCandidatesByCompetitionId() {
@@ -227,9 +252,15 @@ public class DataBaseTest {
         assertTrue("Vote inserted and found", votesComp.size()==1);
 
         List<Vote> votesCand = mapper.findVotesForCandidate(name,competition.getId());
-        assertTrue("Vote inserted and found", votesComp.size()==1);
+        assertTrue("Vote inserted and found", votesCand.size()==1);
 
     }
 
+   @After
+   public void cleanBase(){
+       mapper.deleteAllVotes();
+       mapper.deleteAllCandidates();
+       mapper.deleteAllCompetitions();
+   }
 
 }
