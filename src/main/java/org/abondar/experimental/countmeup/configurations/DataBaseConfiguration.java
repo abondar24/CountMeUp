@@ -1,6 +1,5 @@
 package org.abondar.experimental.countmeup.configurations;
 
-import org.abondar.experimental.countmeup.mappers.Mapper;
 import org.abondar.experimental.countmeup.model.Candidate;
 import org.abondar.experimental.countmeup.model.Competition;
 import org.abondar.experimental.countmeup.model.User;
@@ -8,7 +7,6 @@ import org.abondar.experimental.countmeup.model.Vote;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
-import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,8 +25,6 @@ import javax.sql.DataSource;
 public class DataBaseConfiguration {
 
 
-//    @Value("${driverClassName}")
-//    public String driverClassName;
 
     @Value("${ip_address}")
     public String ipAddress;
@@ -48,7 +44,6 @@ public class DataBaseConfiguration {
     @Bean
     public DataSource dataSource() {
         BasicDataSource dataSource = new BasicDataSource();
-//        dataSource.setDriverClassName(driverClassName);
         dataSource.setUrl("jdbc:mysql://" + ipAddress
                 + ":" + port + "/" + dbName);
         dataSource.setUsername(username);

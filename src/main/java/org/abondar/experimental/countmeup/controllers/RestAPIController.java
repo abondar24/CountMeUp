@@ -17,9 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 
-/**
- * Created by abondar on 3/10/17.
- */
+
 @RestController
 @RequestMapping("/count_me")
 public class RestAPIController {
