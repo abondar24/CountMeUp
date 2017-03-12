@@ -52,6 +52,26 @@ public class DataBaseTest {
 
 
     @Test
+    public void testFindUserByToken() {
+        logger.info("Find User By Token Test");
+        mapper.deleteAllUsers();
+
+        UUID uuid = UUID.randomUUID();
+        String userID = uuid.toString();
+        String token = "sadadsad";
+        User user = new User(uuid.toString(), token);
+
+        mapper.insertOrUpdateUser(user);
+
+        User foundUser = mapper.findUserByToken(token);
+        logger.info(foundUser.toString());
+        assertTrue("User found by token", foundUser.getToken().equals(token));
+
+        mapper.deleteAllUsers();
+    }
+
+
+    @Test
     public void testCompetition() {
         logger.info("Insert Competition Test");
         mapper.deleteAllVotes();

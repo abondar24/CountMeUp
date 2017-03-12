@@ -49,6 +49,14 @@
         WHERE user_id = #{userId}
     </select>
 
+    <select id="findUserByToken" resultMap="userMap">
+        SELECT
+        <include refid="userFields"/>
+        FROM
+        <include refid="userTable"/>
+        WHERE token = #{token}
+    </select>
+
     <delete id="deleteAllUsers">
         DELETE FROM user
     </delete>

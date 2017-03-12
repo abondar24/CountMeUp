@@ -18,6 +18,7 @@ public interface Mapper {
     void insertOrUpdateVote(@Param("vote")Vote vote);
     void insertOrUpdateCandidate(@Param("candidate")Candidate candidate);
     User findUserByUserId(@Param("userId") String  userId);
+    User findUserByToken(@Param("token") String  token);
     Competition findCompetitionById(@Param("id") Long id);
     List<Competition> findAllCompetitions();
     Candidate findCandidateByName(@Param("name")String name);
