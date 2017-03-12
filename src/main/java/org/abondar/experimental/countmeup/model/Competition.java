@@ -7,6 +7,9 @@ public class Competition {
     private String endDate;
     private Boolean isActive;
 
+
+    public Competition(){}
+
     public Competition(String startDate) {
         this.startDate = startDate;
         this.isActive = false;

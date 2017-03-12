@@ -28,7 +28,7 @@
 
     <insert id="insertOrUpdateUser" useGeneratedKeys="true" keyColumn="id" keyProperty="user.id">
         INSERT INTO
-            user ( user_id, token, vote_attempts)
+            user (user_id, token, vote_attempts)
         VALUES (
             #{user.userId},
             #{user.token},
@@ -36,7 +36,7 @@
         )
         ON DUPLICATE KEY UPDATE
             user_id       = #{user.userId},
-            token        = #{user.token},
+            token         = #{user.token},
             vote_attempts = #{user.voteAttempts}
 
     </insert>
@@ -54,7 +54,6 @@
     </delete>
 
 
-
     <!--table competition -->
     <sql id="competitionTable">
         competition comp
@@ -62,30 +61,30 @@
 
     <sql id="competitionFields">
         comp.id as comp_id,
-        comp.startDate as comp_startDate,
-        comp.endDate as comp_endDate,
-        comp.isActive as comp_isActive
+        comp.start_date as comp_startDate,
+        comp.end_date as comp_endDate,
+        comp.is_active as comp_isActive
     </sql>
 
     <resultMap id="competitionMap" type="Competition">
         <id column="comp_id" property="id"/>
-        <result column="comp_startDate" property="start_date"/>
-        <result column="comp_endDate" property="end_date"/>
-        <result column="comp_isActive" property="is_active"/>
+        <result column="comp_startDate" property="startDate"/>
+        <result column="comp_endDate" property="endDate"/>
+        <result column="comp_isActive" property="isActive"/>
     </resultMap>
 
-    <insert id="inserOrUpdatetCompetition" useGeneratedKeys="true" keyColumn="id" keyProperty="competition.id">
+    <insert id="insertOrUpdateCompetition" useGeneratedKeys="true" keyColumn="id" keyProperty="competition.id">
         INSERT INTO
-            competition (startDate, endDate, isActive)
+            competition (start_date, end_date, is_active)
         VALUES (
             #{competition.startDate},
             #{competition.endDate},
             #{competition.isActive}
         )
         ON DUPLICATE KEY UPDATE
-            startDate = #{competition.startDate},
-            endDate   = #{competition.endDate},
-            isActive  = #{competition.isActive}
+            start_date = #{competition.startDate},
+            end_date   = #{competition.endDate},
+            is_active  = #{competition.isActive}
 
     </insert>
 
@@ -96,6 +95,13 @@
         <include refid="competitionTable"/>
         WHERE comp.id = #{id}
 
+    </select>
+
+    <select id="findAllCompetitions" resultMap="competitionMap">
+        SELECT
+        <include refid="competitionFields"/>
+        FROM
+        <include refid="competitionTable"/>
     </select>
 
     <delete id="deleteAllCompetitions">
@@ -111,34 +117,43 @@
     <sql id="candidateFields">
         cand.id as cand_id,
         cand.name as cand_name,
-        cand.competitionId as cand_competitionId
+        cand.competition_id as cand_competitionId
     </sql>
 
     <resultMap id="candidateMap" type="Candidate">
         <id column="cand_id" property="id"/>
         <result column="cand_name" property="name"/>
-        <result column="cand_competitionId" property="competition_id"/>
+        <result column="cand_competitionId" property="competitionId"/>
     </resultMap>
 
     <insert id="insertOrUpdateCandidate" useGeneratedKeys="true" keyColumn="id" keyProperty="candidate.id">
         INSERT INTO
-            candidate (name, competitionId)
+            candidate (name, competition_id)
         VALUES (
             #{candidate.name},
             #{candidate.competitionId}
         )
         ON DUPLICATE KEY UPDATE
-            name    = #{candidate.name},
-            endDate = #{candidate.competitionId}
+            name     = #{candidate.name},
+            competition_id = #{candidate.competitionId}
     </insert>
 
-    <select id="findCandidatesByIds" resultMap="competitionMap">
+    <select id="findCandidatesByCompetitionId" resultMap="candidateMap">
         SELECT
         <include refid="candidateFields"/>
         FROM
         <include refid="candidateTable"/>
-        WHERE cand.id in (<foreach collection="candIds" item="param1" separator=",">#{param}</foreach>)
+        WHERE cand.competition_id =#{competitionId}
     </select>
+
+    <select id="findCandidateByName" resultMap="candidateMap">
+        SELECT
+        <include refid="candidateFields"/>
+        FROM
+        <include refid="candidateTable"/>
+        WHERE cand.name =#{name}
+    </select>
+
 
     <delete id="deleteAllCandidates">
         DELETE FROM candidate
@@ -151,26 +166,26 @@
 
     <sql id="voteFields">
         vt.id as vt_id,
-        vt.candidateId as vt_candidateId,
-        vt.competitionId as vt_competitionId
+        vt.candidate_id as vt_candidateId,
+        vt.competition_id as vt_competitionId
     </sql>
 
     <resultMap id="voteMap" type="Vote">
         <id column="vote_id" property="id"/>
-        <result column="vt_candidateId" property="candidate_id"/>
-        <result column="vt_competitionId" property="competition_id"/>
+        <result column="vt_candidateId" property="candidateId"/>
+        <result column="vt_competitionId" property="competitionId"/>
     </resultMap>
 
     <insert id="insertOrUpdateVote" useGeneratedKeys="true" keyColumn="id" keyProperty="vote.id">
         INSERT INTO
-            vote (candidateId, competitionId)
+            vote (candidate_id, competition_id)
         VALUES (
             #{vote.candidateId},
             #{vote.competitionId}
         )
         ON DUPLICATE KEY UPDATE
-            candidateId   = #{vote.candidateId},
-            competitionId = #{vote.competitionId}
+            candidate_id   = #{vote.candidateId},
+            competition_id = #{vote.competitionId}
     </insert>
 
     <select id="findVotesForCompetition" resultMap="voteMap">
@@ -178,7 +193,7 @@
         <include refid="voteFields"/>
         FROM
         <include refid="voteTable"/>
-        WHERE vt.competitionId = #{competitionId}
+        WHERE vt.competition_id = #{competitionId}
     </select>
 
 
@@ -187,7 +202,10 @@
         <include refid="voteFields"/>
         FROM
         <include refid="voteTable"/>
-        WHERE vt.competitionId = #{competitionId} AND vt.candidateId= #{candidateID}
+        JOIN
+        <include refid="candidateTable"/>
+        ON cand.id = vt.candidate_id
+        WHERE vt.competition_id = #{competitionId} AND cand.name= #{name}
     </select>
 
 

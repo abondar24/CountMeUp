@@ -6,11 +6,13 @@ package org.abondar.experimental.countmeup.model;
 public class Candidate {
     private Long id;
     private String name;
-    private Long competition_id;
+    private Long competitionId;
 
-    public Candidate(String name, Long competition_id) {
+    public Candidate(){}
+
+    public Candidate(String name, Long competitionId) {
         this.name = name;
-        this.competition_id = competition_id;
+        this.competitionId = competitionId;
     }
 
     public Long getId() {
@@ -29,12 +31,12 @@ public class Candidate {
         this.name = name;
     }
 
-    public Long getCompetition_id() {
-        return competition_id;
+    public Long getCompetitionId() {
+        return competitionId;
     }
 
-    public void setCompetition_id(Long competition_id) {
-        this.competition_id = competition_id;
+    public void setCompetitionId(Long competitionId) {
+        this.competitionId = competitionId;
     }
 
     @Override
@@ -42,7 +44,7 @@ public class Candidate {
         return "Candidate{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", competition_id=" + competition_id +
+                ", competitionId=" + competitionId +
                 '}';
     }
 }
