@@ -7,7 +7,6 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.css" rel="stylesheet">
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.6.0/angular.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.6.0/angular-resource.js"></script>
     <script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
 
 </head>
@@ -16,7 +15,7 @@
         .config(["$httpProvider", function ($httpProvider) {
             $httpProvider.defaults.headers.common['Access-Control-Allow-Headers'] = '*'
         }])
-        .controller("countCtrl", function ($scope, $http, $window) {
+        .controller("countCtrl", function ($scope, $http) {
 
             $scope.fakeToken = "asasasafgdg";
             $scope.userId = "";
@@ -26,33 +25,42 @@
 
             $scope.signUp = function () {
                 $http({
-                    url:"http://localhost:8080/count_me/authorize_user",
-                    method:"Post",
-                    parameters:{token:fakeToken}}).success(function (data) {
+                    url: "http://localhost:8080/count_me/authorize_user",
+                    method: "Post",
+                    parameters: {token: fakeToken}
+                }).then(function (data) {
                     $scope.userId = data;
+                    console.log($scope.userId)
                 })
             };
 
             $scope.Login = function () {
                 $http({
-                    url:"http://localhost:8080/count_me/authorize_user",
-                    method:"Post",
-                    parameters:{token:fakeToken}}).success(function (data) {
-                        $scope.userId = data;
-                    })
+                    url: "http://localhost:8080/count_me/authorize_user",
+                    method: "Post",
+                    parameters: {token: fakeToken}
+                }).then(function (data) {
+                    $scope.userId = data;
+                    console.log($scope.userId)
+                })
             };
 
 
             $scope.voteForCandidate = function (candidateName) {
                 $http({
-                    url:"http://localhost:8080/count_me/vote",
-                     params:{candidate:candidateName,
-                         competition:$scope.competitionId,
-                         user_Id:$scope.userId}})
-                    .success(function (data) {
+                    url: "http://localhost:8080/count_me/vote",
+                    method: "POST",
+                    params: {
+                        candidate: candidateName,
+                        competition: $scope.competitionId,
+                        user_Id: $scope.userId
+                    }
+                })
+                    .then(function (data) {
                         console.log(data)
                     })
             };
+
 
 
             $scope.getCompetition = function () {
@@ -80,17 +88,8 @@
                 };
                 ws.onmessage = function (event) {
 
-                    console.log(event);
-                    $scope.vote = JSON.parse(event.data);
-                    if ($scope.totalVotes != 0) {
-                        $scope.vote.percent = $scope.vote.votes / $scope.totalVotes
-                    } else {
-                        $scope.vote.percent = 0;
-                    }
-
-                  console.log($scope.vote)
-
-
+                    $scope.voteList = JSON.parse(event.data);
+                    console.log($scope.voteList)
 
                 };
                 ws.onclose = function () {
@@ -131,14 +130,15 @@
         </tr>
         </thead>
         <tbody>
-        <tr >
+        <tr ng-repeat = "vt in voteList">
             <td>
-                <button class="btn btn-xs btn-primary" ng-click="voteForCandidate(vote.candidateName)">Vote
+                <button class="btn btn-xs btn-primary" ng-click="voteForCandidate(vote.candidateName)">
+                    Vote
                 </button>
             </td>
-            <td ng-bind="vote.name"/>
-            <td>{{vote.votes}}</td>
-            <td>{{vote.percent}}</td>
+            <td>{{vt.name}}</td>
+            <td>{{vt.votes}}</td>
+            <td>{{vt.percent}}</td>
         </tr>
         </tbody>
     </table>
