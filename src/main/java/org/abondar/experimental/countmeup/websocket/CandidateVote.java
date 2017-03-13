@@ -6,7 +6,6 @@ public class CandidateVote {
     private String name;
     private Integer votes;
 
-
     public CandidateVote(String name, Integer votes) {
         this.name = name;
         this.votes = votes;
@@ -29,8 +28,5 @@ public class CandidateVote {
         this.votes = votes;
     }
 
-    @Override
-    public String toString() {
-        return "{" + " name:'" + name  + " votes:" + votes + "}";
-    }
+
 }

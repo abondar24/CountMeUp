@@ -48,24 +48,25 @@ public class RestAPIController {
             logger.info("User created and authorized");
 
         }
-        return "auth complete";
+        return user.getUserId();
     }
 
 
     @RequestMapping(value = "/vote", method = RequestMethod.POST)
     @ResponseBody
     public String vote(@RequestParam(value = "candidate") String name,
-                       @RequestParam(value = "competition") Long competitionId,
-                       @RequestParam(value = "userId") String userId) {
+                       @RequestParam(value = "competition") Integer competitionId,
+                       @RequestParam(value = "user_id") String userId) {
 
 
+        Long compID = Long.valueOf(competitionId);
         Candidate candidate = mapper.findCandidateByName(name);
-        Competition competition = mapper.findCompetitionById(competitionId);
+        Competition competition = mapper.findCompetitionById(compID);
         User user = mapper.findUserByUserId(userId);
         if (candidate != null && competition != null && user != null) {
             Integer voteAttempts = user.getVoteAttempts();
             if (voteAttempts <= 3) {
-                Vote vote = new Vote(candidate.getId(), competitionId);
+                Vote vote = new Vote(candidate.getId(), compID);
                 mapper.insertOrUpdateVote(vote);
                 voteAttempts += 1;
                 user.setVoteAttempts(voteAttempts);
@@ -86,29 +87,39 @@ public class RestAPIController {
 
     @RequestMapping(value = "/get_total_votes", method = RequestMethod.GET)
     @ResponseBody
-    public Long getTotalVotes(@RequestParam(value = "competition") Long competitionId) {
+    public Long getTotalVotes(@RequestParam(value = "competition") Integer competitionId) {
 
-        List<Vote> votes = mapper.findVotesForCompetition(competitionId);
-        Integer votesCount = votes.size();
+        Long compID = Long.valueOf(competitionId);
+        Competition competition = mapper.findCompetitionById(compID);
 
-        return Long.valueOf(votesCount);
+        if (competition!=null) {
+            List<Vote> votes = mapper.findVotesForCompetition(compID);
+            Integer votesCount = votes.size();
+            return Long.valueOf(votesCount);
+
+        }  else {
+            return 0l;
+        }
+
+
     }
 
 
     @RequestMapping(value = "/get_votes_for_candidate", method = RequestMethod.GET)
     @ResponseBody
     public Double getTotalVotesOfCandidate(@RequestParam(value = "candidate") String name,
-                                           @RequestParam(value = "competition") Long competitionId,
+                                           @RequestParam(value = "competition") Integer competitionId,
                                            @RequestParam(value = "mode") String mode) {
 
         Double res = 0.0;
 
-        List<Vote> votes = mapper.findVotesForCandidate(name, competitionId);
+        Long compID = Long.valueOf(competitionId);
+        List<Vote> votes = mapper.findVotesForCandidate(name, compID);
         Integer voteCount = votes.size();
 
 
         if (mode.equals("percent")) {
-            List<Vote> totalVotes = mapper.findVotesForCompetition(competitionId);
+            List<Vote> totalVotes = mapper.findVotesForCompetition(compID);
             Integer totalVoteCount = totalVotes.size();
             res = Double.valueOf(voteCount) / totalVoteCount;
         } else if (mode.equals("count")) {
@@ -120,17 +131,19 @@ public class RestAPIController {
 
     @RequestMapping(value = "/get_candidates_for_competition", method = RequestMethod.GET)
     @ResponseBody
-    public List<Candidate> getCandidates(@RequestParam(value = "competition") Long competitionId) {
+    public List<Candidate> getCandidates(@RequestParam(value = "competition") Integer competitionId) {
 
-        return mapper.findCandidatesByCompetitionId(competitionId);
+        Long compID = Long.valueOf(competitionId);
+        return mapper.findCandidatesByCompetitionId(compID);
     }
 
 
     @RequestMapping(value = "/get_competition", method = RequestMethod.GET)
     @ResponseBody
-    public Competition getCompetition(@RequestParam(value = "competition") Long competitionId) {
+    public Competition getCompetition(@RequestParam(value = "competition") Integer competitionId) {
 
-        return mapper.findCompetitionById(competitionId);
+        Long compID = Long.valueOf(competitionId);
+        return mapper.findCompetitionById(compID);
     }
 
 
@@ -160,12 +173,13 @@ public class RestAPIController {
     @RequestMapping(value = "/add_candidate", method = RequestMethod.POST)
     @ResponseBody
     public Candidate addCandidate(@RequestParam(value = "name") String name,
-                                  @RequestParam(value = "competition") Long competitionId) {
+                                  @RequestParam(value = "competition") Integer competitionId) {
 
-        Competition competition = mapper.findCompetitionById(competitionId);
+        Long compID = Long.valueOf(competitionId);
+        Competition competition = mapper.findCompetitionById(compID);
 
         if (competition != null) {
-            Candidate candidate = new Candidate(name, competitionId);
+            Candidate candidate = new Candidate(name, compID);
             mapper.insertOrUpdateCandidate(candidate);
             logger.info("Candidate added");
             return candidate;
@@ -178,8 +192,9 @@ public class RestAPIController {
 
     @RequestMapping(value = "/start_competition", method = RequestMethod.POST)
     @ResponseBody
-    public String startCompetition(@RequestParam(value = "competition") Long competitionId) {
-        Competition competition = mapper.findCompetitionById(competitionId);
+    public String startCompetition(@RequestParam(value = "competition") Integer competitionId) {
+        Long compID = Long.valueOf(competitionId);
+        Competition competition = mapper.findCompetitionById(compID);
         if (competition != null) {
             competition.setActive(true);
             mapper.insertOrUpdateCompetition(competition);
@@ -196,9 +211,10 @@ public class RestAPIController {
 
     @RequestMapping(value = "/end_competition", method = RequestMethod.PUT)
     @ResponseBody
-    public String endCompetition(@RequestParam(value = "competition") Long competitionId) {
+    public String endCompetition(@RequestParam(value = "competition") Integer competitionId) {
 
-        Competition competition = mapper.findCompetitionById(competitionId);
+        Long compID = Long.valueOf(competitionId);
+        Competition competition = mapper.findCompetitionById(compID);
         if (competition != null) {
             competition.setActive(false);
             Date date = new Date();

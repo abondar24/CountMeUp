@@ -41,6 +41,8 @@ public class VoteTimer {
             logger.info(candidate.getName() + " "+candVotes.size());
         }
 
+        candidateVotes.add(new CandidateVote("Vasya",100));
+        candidateVotes.add(new CandidateVote("Zenya",300));
         if (!candidateVotes.isEmpty()) {
             for (CandidateVote candidateVote : candidateVotes) {
                 session.sendMessage(new TextMessage(formMessage(candidateVote)));

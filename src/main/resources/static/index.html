@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en " ng-app="countMeUp">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Count me up!</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.css" rel="stylesheet">
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.6.0/angular.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.6.0/angular-resource.js"></script>
+    <script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
+
+</head>
+<script>
+    angular.module("countMeUp", [])
+        .config(["$httpProvider", function ($httpProvider) {
+            $httpProvider.defaults.headers.common['Access-Control-Allow-Headers'] = '*'
+        }])
+        .controller("countCtrl", function ($scope, $http, $window) {
+
+            $scope.fakeToken = "asasasafgdg";
+            $scope.userId = "";
+            $scope.totalVotes = 0;
+            $scope.competitionId = 0;
+
+
+            $scope.signUp = function () {
+                $http({
+                    url:"http://localhost:8080/count_me/authorize_user",
+                    method:"Post",
+                    parameters:{token:fakeToken}}).success(function (data) {
+                    $scope.userId = data;
+                })
+            };
+
+            $scope.Login = function () {
+                $http({
+                    url:"http://localhost:8080/count_me/authorize_user",
+                    method:"Post",
+                    parameters:{token:fakeToken}}).success(function (data) {
+                        $scope.userId = data;
+                    })
+            };
+
+
+            $scope.voteForCandidate = function (candidateName) {
+                $http({
+                    url:"http://localhost:8080/count_me/vote",
+                     params:{candidate:candidateName,
+                         competition:$scope.competitionId,
+                         user_Id:$scope.userId}})
+                    .success(function (data) {
+                        console.log(data)
+                    })
+            };
+
+
+            $scope.getCompetition = function () {
+                $http.get("http://localhost:8080/count_me/get_active_competition").then(function (data) {
+                    var json = JSON.parse(data);
+                    $scope.competitionId = json.competitionId;
+                })
+            };
+
+            $scope.getTotalVotes = function () {
+                $http({
+                    url: "http://localhost:8080/count_me/get_total_votes",
+                    method: "GET",
+                    params: {competition: $scope.competitionId}
+                }).then(function (data) {
+                    var json = JSON.parse(data);
+                    $scope.totalVotes = json.totalVotes;
+                })
+            };
+
+            $scope.connectToWs = function () {
+                var ws = new SockJS("/echo");
+                ws.onopen = function () {
+                    console.log('Info: WebSocket connection opened.');
+                };
+                ws.onmessage = function (event) {
+
+                    console.log(event);
+                    $scope.vote = JSON.parse(event.data);
+                    if ($scope.totalVotes != 0) {
+                        $scope.vote.percent = $scope.vote.votes / $scope.totalVotes
+                    } else {
+                        $scope.vote.percent = 0;
+                    }
+
+                  console.log($scope.vote)
+
+
+
+                };
+                ws.onclose = function () {
+
+                    console.log('Info: WebSocket connection closed.');
+                };
+            };
+
+
+            $scope.getCompetition();
+            $scope.getTotalVotes();
+            $scope.connectToWs();
+
+
+        })
+
+</script>
+
+<body ng-controller="countCtrl">
+<div class="header">
+    <div class="navbar navbar-inverse">
+        <ul class="nav navbar-nav">
+            <li>
+                <a class="navbar-part" data-toggle="modal" href="#auth">Authorize</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div>
+    <table class="table table-stripped table-bordered">
+        <thead>
+        <tr>
+            <th>Vote</th>
+            <th>Candidate</th>
+            <th>Votes</th>
+            <th>%</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr >
+            <td>
+                <button class="btn btn-xs btn-primary" ng-click="voteForCandidate(vote.candidateName)">Vote
+                </button>
+            </td>
+            <td ng-bind="vote.name"/>
+            <td>{{vote.votes}}</td>
+            <td>{{vote.percent}}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="container" class="content">
+    <div id="auth" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Authorize</h4>
+                </div>
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" ng-click="logIn()">Log in</button>
+                    <button type="button" class="close" data-dismiss="modal" ng-click="signUp()">Sign up</button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
