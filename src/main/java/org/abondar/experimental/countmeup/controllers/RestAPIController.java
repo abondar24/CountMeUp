@@ -1,5 +1,6 @@
 package org.abondar.experimental.countmeup.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.abondar.experimental.countmeup.app.CountApplication;
 import org.abondar.experimental.countmeup.mappers.Mapper;
 import org.abondar.experimental.countmeup.model.Candidate;
@@ -26,6 +27,8 @@ public class RestAPIController {
 
     static Logger logger = LoggerFactory.getLogger(CountApplication.class);
 
+    private ObjectMapper om = new ObjectMapper();
+
     public RestAPIController() {
         logger.info("REST Service started");
     }
@@ -33,8 +36,7 @@ public class RestAPIController {
 
     @RequestMapping(value = "/authorize_user", method = RequestMethod.POST)
     @ResponseBody
-    public String authUser(@RequestParam(value = "token") String token) {
-
+    public String authUser(@RequestParam(value = "token") String token) throws Exception {
         User user = mapper.findUserByToken(token);
         if (user != null) {
             if (user.getToken().equals(token)) {
@@ -48,7 +50,9 @@ public class RestAPIController {
             logger.info("User created and authorized");
 
         }
-        return user.getUserId();
+
+
+        return om.writeValueAsString(user.getUserId());
     }
 
 
@@ -56,7 +60,7 @@ public class RestAPIController {
     @ResponseBody
     public String vote(@RequestParam(value = "candidate") String name,
                        @RequestParam(value = "competition") Integer competitionId,
-                       @RequestParam(value = "user_id") String userId) {
+                       @RequestParam(value = "user_id") String userId) throws Exception {
 
 
         Long compID = Long.valueOf(competitionId);
@@ -72,13 +76,13 @@ public class RestAPIController {
                 user.setVoteAttempts(voteAttempts);
                 mapper.insertOrUpdateUser(user);
                 logger.info("Vote accepted: " + vote.toString());
-                return "vote accepted";
+                return om.writeValueAsString("vote accepted");
             } else {
-                return "use has used all of his attempts";
+                return om.writeValueAsString("use has used all of his attempts");
             }
 
         } else {
-            return "one or more wrong parameters";
+            return om.writeValueAsString("one or more wrong parameters");
         }
 
 
@@ -87,18 +91,18 @@ public class RestAPIController {
 
     @RequestMapping(value = "/get_total_votes", method = RequestMethod.GET)
     @ResponseBody
-    public Long getTotalVotes(@RequestParam(value = "competition") Integer competitionId) {
+    public String getTotalVotes(@RequestParam(value = "competition") Integer competitionId) throws Exception {
 
         Long compID = Long.valueOf(competitionId);
         Competition competition = mapper.findCompetitionById(compID);
 
-        if (competition!=null) {
+        if (competition != null) {
             List<Vote> votes = mapper.findVotesForCompetition(compID);
             Integer votesCount = votes.size();
-            return Long.valueOf(votesCount);
+            return om.writeValueAsString(Long.valueOf(votesCount));
 
-        }  else {
-            return 0l;
+        } else {
+            return om.writeValueAsString(0l);
         }
 
 
@@ -107,9 +111,9 @@ public class RestAPIController {
 
     @RequestMapping(value = "/get_votes_for_candidate", method = RequestMethod.GET)
     @ResponseBody
-    public Double getTotalVotesOfCandidate(@RequestParam(value = "candidate") String name,
+    public String getTotalVotesOfCandidate(@RequestParam(value = "candidate") String name,
                                            @RequestParam(value = "competition") Integer competitionId,
-                                           @RequestParam(value = "mode") String mode) {
+                                           @RequestParam(value = "mode") String mode) throws Exception {
 
         Double res = 0.0;
 
@@ -126,34 +130,35 @@ public class RestAPIController {
             res = Double.valueOf(voteCount);
         }
 
-        return res;
+        return om.writeValueAsString(res);
     }
 
     @RequestMapping(value = "/get_candidates_for_competition", method = RequestMethod.GET)
     @ResponseBody
-    public List<Candidate> getCandidates(@RequestParam(value = "competition") Integer competitionId) {
+    public String getCandidates(@RequestParam(value = "competition") Integer competitionId) throws Exception {
 
         Long compID = Long.valueOf(competitionId);
-        return mapper.findCandidatesByCompetitionId(compID);
+        List<Candidate> candidates = mapper.findCandidatesByCompetitionId(compID);
+        return om.writeValueAsString(candidates);
     }
 
 
     @RequestMapping(value = "/get_competition", method = RequestMethod.GET)
     @ResponseBody
-    public Competition getCompetition(@RequestParam(value = "competition") Integer competitionId) {
+    public String getCompetition(@RequestParam(value = "competition") Integer competitionId) throws Exception {
 
         Long compID = Long.valueOf(competitionId);
-        return mapper.findCompetitionById(compID);
+        Competition competition = mapper.findCompetitionById(compID);
+        return om.writeValueAsString(competition);
     }
 
 
     @RequestMapping(value = "/get_active_competition", method = RequestMethod.GET)
     @ResponseBody
-    public Competition getActiveCompetition() {
+    public String getActiveCompetition() throws Exception {
 
         Competition competition = mapper.findActiveCompetition();
-
-        return competition;
+        return om.writeValueAsString(competition);
     }
 
 
@@ -172,8 +177,8 @@ public class RestAPIController {
 
     @RequestMapping(value = "/add_candidate", method = RequestMethod.POST)
     @ResponseBody
-    public Candidate addCandidate(@RequestParam(value = "name") String name,
-                                  @RequestParam(value = "competition") Integer competitionId) {
+    public String addCandidate(@RequestParam(value = "name") String name,
+                               @RequestParam(value = "competition") Integer competitionId) throws Exception {
 
         Long compID = Long.valueOf(competitionId);
         Competition competition = mapper.findCompetitionById(compID);
@@ -182,17 +187,17 @@ public class RestAPIController {
             Candidate candidate = new Candidate(name, compID);
             mapper.insertOrUpdateCandidate(candidate);
             logger.info("Candidate added");
-            return candidate;
+            return om.writeValueAsString(candidate);
         } else {
             logger.info("No competition found");
-            return null;
+            return om.writeValueAsString("");
         }
 
     }
 
     @RequestMapping(value = "/start_competition", method = RequestMethod.POST)
     @ResponseBody
-    public String startCompetition(@RequestParam(value = "competition") Integer competitionId) {
+    public String startCompetition(@RequestParam(value = "competition") Integer competitionId) throws Exception {
         Long compID = Long.valueOf(competitionId);
         Competition competition = mapper.findCompetitionById(compID);
         if (competition != null) {
@@ -200,10 +205,10 @@ public class RestAPIController {
             mapper.insertOrUpdateCompetition(competition);
 
             logger.info("Competition started");
-            return "competition started";
+            return om.writeValueAsString("competition started");
         } else {
             logger.info("No competition found");
-            return "No competition found";
+            return om.writeValueAsString("No competition found");
         }
 
 
@@ -211,7 +216,7 @@ public class RestAPIController {
 
     @RequestMapping(value = "/end_competition", method = RequestMethod.PUT)
     @ResponseBody
-    public String endCompetition(@RequestParam(value = "competition") Integer competitionId) {
+    public String endCompetition(@RequestParam(value = "competition") Integer competitionId) throws Exception {
 
         Long compID = Long.valueOf(competitionId);
         Competition competition = mapper.findCompetitionById(compID);
@@ -221,10 +226,10 @@ public class RestAPIController {
             competition.setEndDate(date.toString());
             mapper.insertOrUpdateCompetition(competition);
             logger.info("Competition started");
-            return "competition started";
+            return om.writeValueAsString("competition started");
         } else {
             logger.info("No competition found");
-            return "No competition found";
+            return om.writeValueAsString("No competition found");
         }
 
     }

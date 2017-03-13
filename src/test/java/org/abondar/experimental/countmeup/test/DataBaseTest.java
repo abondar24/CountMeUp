@@ -278,11 +278,6 @@ public class DataBaseTest {
 
     }
 
-   @After
-   public void cleanBase(){
-       mapper.deleteAllVotes();
-       mapper.deleteAllCandidates();
-       mapper.deleteAllCompetitions();
-   }
+
 
 }

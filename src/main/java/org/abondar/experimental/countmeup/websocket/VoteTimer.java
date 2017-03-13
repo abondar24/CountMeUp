@@ -1,6 +1,7 @@
 package org.abondar.experimental.countmeup.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.abondar.experimental.countmeup.mappers.Mapper;
 import org.abondar.experimental.countmeup.model.Candidate;
 import org.abondar.experimental.countmeup.model.Vote;
@@ -41,11 +42,8 @@ public class VoteTimer {
             logger.info(candidate.getName() + " "+candVotes.size());
         }
 
-        candidateVotes.add(new CandidateVote("Vasya",100));
-        candidateVotes.add(new CandidateVote("Zenya",300));
-        if (!candidateVotes.isEmpty()) {
+       if (!candidateVotes.isEmpty()) {
             session.sendMessage(new TextMessage(formMessage(candidateVotes)));
-
 
         } else {
             session.sendMessage(new TextMessage("No active competitions now"));
@@ -56,7 +54,9 @@ public class VoteTimer {
 
     public static String formMessage(List<CandidateVote> candidateVotes) throws Exception{
         ObjectMapper om = new ObjectMapper();
-        return om.writerWithDefaultPrettyPrinter().writeValueAsString(candidateVotes);
+        ObjectWriter writer = om.writer().withRootName("candidateVotes");
+
+        return writer.writeValueAsString(candidateVotes);
     }
 
 
