@@ -1,6 +1,8 @@
-CREATE DATABASE count_me_up;
+CREATE DATABASE IF NOT EXISTS count_me_up;
 
-CREATE TABLE user (
+USE count_me_up;
+
+CREATE TABLE IF NOT EXISTS user (
 
   id            BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   token         VARCHAR(255),
@@ -8,7 +10,7 @@ CREATE TABLE user (
   vote_attempts INTEGER
 );
 
-CREATE TABLE competition (
+CREATE TABLE IF NOT EXISTS competition (
 
   id         BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   start_date VARCHAR(255)       NOT NULL,
@@ -16,24 +18,24 @@ CREATE TABLE competition (
   is_active  BOOLEAN
 );
 
-CREATE TABLE candidate (
+CREATE TABLE IF NOT EXISTS candidate (
 
   id             BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   name           VARCHAR(255)       NOT NULL,
-  competitionId BIGINT
+  competition_id BIGINT
 );
 
 
 ALTER TABLE candidate
   ADD CONSTRAINT fk_comp_cand
-FOREIGN KEY (competitionId) REFERENCES competition (id);
+FOREIGN KEY (competition_id) REFERENCES competition (id);
 
 
-CREATE TABLE vote (
+CREATE TABLE IF NOT EXISTS vote (
 
   id             BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   candidate_id   BIGINT,
-  competitionId BIGINT
+  competition_id BIGINT
 );
 
 
@@ -43,4 +45,4 @@ FOREIGN KEY (candidate_id) REFERENCES candidate (id);
 
 ALTER TABLE vote
   ADD CONSTRAINT fk_comp_vote
-FOREIGN KEY (competitionId) REFERENCES competition (id);
+FOREIGN KEY (competition_id) REFERENCES competition (id);
