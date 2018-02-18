@@ -164,14 +164,15 @@ public class RestAPIController {
 
     // these methods are not used by web client
 
-    @RequestMapping(value = "/add_competition", method = RequestMethod.PUT)
+    @RequestMapping(value = "/add_competition", method = RequestMethod.POST)
     @ResponseBody
-    public void addCompetition() {
+    public Long addCompetition() {
 
         Date date = new Date();
         Competition competition = new Competition(date.toString());
         mapper.insertOrUpdateCompetition(competition);
         logger.info("Competition added");
+        return competition.getId();
     }
 
 

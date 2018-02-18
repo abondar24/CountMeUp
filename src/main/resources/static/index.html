@@ -1,123 +1,145 @@
 <!DOCTYPE html>
-<html lang="en " ng-app="countMeUp">
+<html lang="en " >
 
 <head>
     <meta charset="UTF-8">
     <title>Count me up!</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.css" rel="stylesheet">
-    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.0/angular.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular.js"></script>
     <script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
-
     <script>
         angular.module("countMeUp", [])
-            .config(function ($httpProvider, $httpParamSerializerJQLikeProvider) {
-                $httpProvider.defaults.transformRequest.unshift($httpParamSerializerJQLikeProvider.$get());
-                $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded; charset=utf-8';
+            .factory('baseURL', function ($location) {
+                return $location.protocol() + "://" + $location.host() + (($location.port()) !== undefined ? ":" + $location.port() : "");
             })
-            .controller("countCtrl", function ($scope, $http, $timeout) {
+            .factory('appFactory', function ($http, baseURL, $rootScope) {
 
-                $scope.competitionId = 0;
-                $scope.totalVotes = 0;
-                $scope.voteList = [];
-                $scope.fakeToken = "asasasafgdg";
-                $scope.userId = "";
+                return {
+                     logIn: function(onSuccess) {
+                $http({
+                    url: baseURL+"/count_me/authorize_user",
+                    method: "POST",
+                    params: {token: $rootScope.fakeToken}
+                }).then(function success(resp) {
+                    $rootScope.userId = resp.data;
+                    return onSuccess(resp.status);
+                }, function error (resp) {
+                    console.log(resp)
+                });
+            },
+                    getCompetition: function (onSuccess) {
+
+                        $http({
+                            url: baseURL + "/count_me/get_active_competition",
+                            method: "GET"
+                        }).then(function success(resp) {
+                            $rootScope.competitionId = resp.data.id;
+
+                            return onSuccess(resp.status);
+                        }, function error(resp) {
+                            console.log(resp)
+                        });
+                    },
+                    getTotalVotes : function (onSuccess) {
+                        $http({
+                            url: baseURL + "/count_me/get_total_votes",
+                            method: "GET",
+                            params: {competition: $rootScope.competitionId}
+                        }).then(function success(resp) {
+                            $rootScope.totalVotes = resp.data;
+                            return onSuccess(resp.status);
+                        }, function error(resp) {
+                            console.log(resp)
+                        });
+                    },
+
+                    getWSData: function (broadcast) {
+                        var ws = new SockJS(baseURL+"/echo");
+                        ws.onopen = function () {
+                            console.log('Info: WebSocket connection opened.');
+                        };
+                        ws.onmessage = function (event) {
+                            console.log(event.data);
+                            if (event.data !== "No active competitions found") {
+                                broadcast(event.data);
+                            }
+                        };
+
+                       return function broadcast(votes) {
+                            console.log(votes);
+                            return votes;
+                        }
+
+                    }
+
+            }
+
+        }).run(function ($rootScope) {
+                $rootScope.competitionId = 0;
+                $rootScope.totalVotes = 0;
+                $rootScope.fakeToken = "asasasafgdg";
+                $rootScope.userId = "";
+            })
+            .controller("countCtrl", function ($scope, $http,baseURL,$rootScope,appFactory) {
 
                 $scope.logIn = function () {
+                    appFactory.logIn(function (status) {
+                        if (status===200){
+                            $scope.userId = $rootScope.userId;
+                            appFactory.getCompetition(function (status) {
+                                    if (status===200){
+                                        appFactory.getTotalVotes(function (status) {
+                                            if (status === 200){
 
-                    $http({
-                        url: "http://localhost:8080/count_me/authorize_user",
-                        method: "POST",
-                        data: {token: $scope.fakeToken}
-                    }).success(function (resp) {
+                                                $scope.voteList = appFactory.getWSData();
 
-                        $scope.userId = resp;
 
-                    }).error(function (resp) {
-                        console.log(resp)
+                                                ws.onclose = function () {
+
+                                                    console.log('Info: WebSocket connection closed.');
+                                                };
+
+                                            } else {
+                                                console.log("error");
+                                            }
+                                        });
+                                    } else {
+                                        console.log("error")
+                                    }
+                                });
+
+                            }
                     });
 
+
                 };
-
-
-                console.log($scope.userId)
 
 
                 $scope.voteForCandidate = function (candidateName) {
                     $http({
-                        url: "http://localhost:8080/count_me/vote",
+                        url: baseURL + "/count_me/vote",
                         method: "POST",
                         data: {
                             candidate: candidateName,
-                            competition: $scope.competitionId,
-                            user_Id: $scope.userId
+                            competition: $rootScope.competitionId,
+                            user_Id: $rootScope.userId
                         }
-                    })
-                        .success(function (resp) {
-                            console.log(resp)
-                        })
-                        .error(function (resp) {
-                            console.log(resp)
-                        })
+                    }).then(function success(resp) {
+                        console.log(resp)
+
+                    }, function error(resp) {
+                        console.log(resp)
+                    });
                 };
 
-
-                $scope.getCompetition = function () {
-                    $http.get("http://localhost:8080/count_me/get_active_competition")
-                        .success(function (resp) {
-
-                            $scope.competitionId = resp.id
-                        }).error(function (resp) {
-                        console.log(data)
-                    })
-                };
-
-                $scope.getTotalVotes = function () {
-                    console.log($scope.competitionId);
-                    $http({
-                        url: "http://localhost:8080/count_me/get_total_votes",
-                        method: "GET",
-                        data: {competition: $scope.competitionId}
-                    }).success(function (resp) {
-                        $scope.totalVotes = resp;
-                    })
-                        .error(function (resp) {
-                            console.log(resp)
-                        })
-                };
-
-
-                //if ($scope.userId != "") {
-                $scope.getCompetition();
-                $scope.getTotalVotes();
-
-                var ws = new SockJS("/echo");
-                ws.onopen = function () {
-                    console.log('Info: WebSocket connection opened.');
-                };
-                ws.onmessage = function (event) {
-                    console.log(event.data)
-
-                    if (event.data != "No active competitions found") {
-                        $timeout(function () {
-                            $scope.voteList = event.data.candidateVotes;
-
-                        }, 500);
-                    }
-                };
-                ws.onclose = function () {
-
-                    console.log('Info: WebSocket connection closed.');
-                };
-
-                //  }
             });
-
 
     </script>
 </head>
 
-<body ng-controller="countCtrl">
+<body ng-app="countMeUp" >
+<div id="countMeUp" ng-controller="countCtrl">
 <div class="header">
     <div class="panel panel-primary">
         <h1 class="panel-heading">Count me Up!!!</h1>
@@ -126,6 +148,7 @@
 </div>
 <div>
     <button type="button " class="btn btn-info btn-lg" data-dismiss="modal" ng-click="logIn()">Log in</button>
+    <span>UserId: {{userId}}</span>
 </div>
 
 <div>
@@ -152,6 +175,7 @@
         </tr>
         </tbody>
     </table>
+</div>
 </div>
 </body>
 </html>
