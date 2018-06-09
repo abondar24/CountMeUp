@@ -40,7 +40,7 @@ dependencies {
 }
 
 test {
-    useJUnit {
-        includeCategories 'org.abondar.experimental.countmeup.test.DataBaseTest'
+    reports {
+        html.enabled=true
     }
 }

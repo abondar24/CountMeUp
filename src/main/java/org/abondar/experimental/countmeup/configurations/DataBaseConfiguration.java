@@ -26,19 +26,19 @@ public class DataBaseConfiguration {
 
 
 
-    @Value("${ip_address}")
+    @Value("${db.ip_address}")
     public String ipAddress;
 
-    @Value("${port}")
+    @Value("${db.port}")
     public String port;
 
-    @Value("${db_name}")
+    @Value("${db.name}")
     public String dbName;
 
-    @Value("${username}")
+    @Value("${db.user}")
     public String username;
 
-    @Value("${password}")
+    @Value("${db.password}")
     public String password;
 
     @Bean
